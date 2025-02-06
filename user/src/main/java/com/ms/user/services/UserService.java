@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ms.user.models.UserModel;
+import com.ms.user.producers.UserProducer;
 import com.ms.user.repositories.UserRepository;
 
 @Service
@@ -13,8 +14,15 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Transactional// garantir o holdback 
+    @Autowired
+    private UserProducer userProducer;
+
+    @Transactional
     public UserModel save(UserModel userModel){
-        return userRepository.save(userModel);
+        userModel = userRepository.save(userModel);
+        userProducer.publishMessageEmail(userModel);
+        return userModel;
     }
+
+
 }
